@@ -1,4 +1,3 @@
-package src;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -27,10 +26,9 @@ public class DatabaseConn {
             while (resultSet.next()) {
                 int id = resultSet.getInt("ID");
                 String username = resultSet.getString("username");
-                String password = resultSet.getString("password");
                 int score = resultSet.getInt("score");
 
-                players.add(new Player(id, username, password, score));
+                players.add(new Player(id, username, score));
             }
 
             // Close the connection

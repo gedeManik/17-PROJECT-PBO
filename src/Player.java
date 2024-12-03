@@ -1,16 +1,13 @@
-package src;
 
 public class Player {
     private int id;
     private String username;
-    private String password;
     private int score;
 
     // Constructor
-    public Player(int id, String username, String password, int score) {
+    public Player(int id, String username, int score) {
         this.id = id;
         this.username = username;
-        this.password = password;
         this.score = score;
     }
 
@@ -31,14 +28,6 @@ public class Player {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public int getScore() {
         return score;
     }
@@ -47,13 +36,8 @@ public class Player {
         this.score = score;
     }
 
-    @Override
-    public String toString() {
-        return "Player{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", score=" + score +
-                '}';
-    }
+    // @Override
+    // public String toString() {
+    //     return "Player{" + "id=" + id + ", username='" + username + '\'' +", score=" + score + '}';
+    // }
 }

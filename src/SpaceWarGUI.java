@@ -1,4 +1,4 @@
-package src;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -36,22 +36,44 @@ public class SpaceWarGUI {
         buttonPanel.setOpaque(false); // Transparent panel
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // Vertical alignment
 
-        // Add Login button
-        JButton loginButton = new JButton("Login");
-        loginButton.setFont(new Font("Arial", Font.PLAIN, 18));
-        loginButton.setAlignmentX(Component.CENTER_ALIGNMENT); // Center align
-        loginButton.setMaximumSize(new Dimension(150, 40)); // Set button size
-        buttonPanel.add(loginButton);
+        // Add play button
+        JButton playButton = new JButton("Play");
+        playButton.setFont(new Font("Arial", Font.PLAIN, 25));
+        playButton.setOpaque(false);
+        playButton.setContentAreaFilled(false);
+        playButton.setBorderPainted(false);
+        playButton.setForeground(Color.WHITE);
+        playButton.setAlignmentX(Component.CENTER_ALIGNMENT); // Center align
+        playButton.setMaximumSize(new Dimension(150, 40)); // Set button size
+        buttonPanel.add(playButton);
 
         // Add spacing between buttons
-        buttonPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // Add Register button
-        JButton registerButton = new JButton("Register");
-        registerButton.setFont(new Font("Arial", Font.PLAIN, 18));
-        registerButton.setAlignmentX(Component.CENTER_ALIGNMENT); // Center align
-        registerButton.setMaximumSize(new Dimension(150, 40)); // Set button size
-        buttonPanel.add(registerButton);
+        // Add topscore button
+        JButton scoreButton = new JButton("Top Score");
+        scoreButton.setFont(new Font("Arial", Font.PLAIN, 25));
+        scoreButton.setOpaque(false);
+        scoreButton.setContentAreaFilled(false);
+        scoreButton.setBorderPainted(false);
+        scoreButton.setForeground(Color.WHITE);
+        scoreButton.setAlignmentX(Component.CENTER_ALIGNMENT); // Center align
+        scoreButton.setMaximumSize(new Dimension(150, 40)); // Set button size
+        buttonPanel.add(scoreButton);
+
+        // Add spacing between buttons
+        buttonPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // Add exit button
+        JButton exitButton = new JButton("Exit");
+        exitButton.setFont(new Font("Arial", Font.PLAIN, 25));
+        exitButton.setOpaque(false);
+        exitButton.setContentAreaFilled(false);
+        exitButton.setBorderPainted(false);
+        exitButton.setForeground(Color.WHITE);
+        exitButton.setAlignmentX(Component.CENTER_ALIGNMENT); // Center align
+        exitButton.setMaximumSize(new Dimension(150, 40)); // Set button size
+        buttonPanel.add(exitButton);
 
         backgroundLabel.add(buttonPanel); // Add the button panel to Grid 3
 

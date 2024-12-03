@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 02, 2024 at 10:26 AM
+-- Generation Time: Dec 03, 2024 at 09:14 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -30,16 +30,8 @@ SET time_zone = "+00:00";
 CREATE TABLE `spacewar` (
   `ID` int(11) NOT NULL,
   `username` varchar(18) NOT NULL,
-  `password` varchar(18) NOT NULL,
   `score` int(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `spacewar`
---
-
-INSERT INTO `spacewar` (`ID`, `username`, `password`, `score`) VALUES
-(1, 'admin', 'admin', 0);
 
 --
 -- Indexes for dumped tables
