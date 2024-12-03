@@ -45,7 +45,7 @@ public class SpaceWarGUI {
         playButton.setForeground(Color.WHITE);
         playButton.setAlignmentX(Component.CENTER_ALIGNMENT); // Center align
         playButton.setMaximumSize(new Dimension(150, 40)); // Set button size
-        buttonPanel.add(playButton);
+        buttonPanel.add(playButton);        
 
         // Add spacing between buttons
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -79,6 +79,16 @@ public class SpaceWarGUI {
 
         // Add the backgroundLabel to the frame
         frame.setContentPane(backgroundLabel);
+
+        playButton.addActionListener(e -> {
+            GamePanel gamePanel = new GamePanel();
+            frame.getContentPane().removeAll(); 
+            frame.setContentPane(gamePanel); // pindah ke game panel
+            frame.revalidate();
+            frame.repaint();
+
+            gamePanel.requestFocusInWindow();
+        });
 
         // Make the frame visible
         frame.setVisible(true);
