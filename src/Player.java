@@ -1,4 +1,3 @@
-
 public class Player {
     private int id;
     private String username;
@@ -38,6 +37,7 @@ public class Player {
 
     // @Override
     // public String toString() {
-    //     return "Player{" + "id=" + id + ", username='" + username + '\'' +", score=" + score + '}';
+    // return "Player{" + "id=" + id + ", username='" + username + '\'' +", score="
+    // + score + '}';
     // }
 }
