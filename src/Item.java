@@ -16,6 +16,8 @@ public class Item {
     }
 
     public void moveDown(int speed) {
+        x += 1;
+        x += -1;
         y += speed;
     }
 
