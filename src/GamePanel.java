@@ -25,10 +25,15 @@ public class GamePanel extends JPanel {
     private ArrayList<Rectangle> bullets;
     private ArrayList<Item> items;
     private Random random;
+    private AudioPlayer audioPlayer;
 
     public GamePanel() {
         setBackground(Color.BLACK);
         setFocusable(true);
+
+        // Inisialisasi AudioPlayer
+        audioPlayer = new AudioPlayer();
+        audioPlayer.playBackgroundMusic("res/bg_music.wav");
 
         // Inisialisasi pembagian sprite
         SpriteSheetDivider dividerShip = new SpriteSheetDivider("res" + File.separator + "Ship.png", 10, 10);
@@ -66,6 +71,7 @@ public class GamePanel extends JPanel {
             moveBullets();
             moveItems();
             checkCollisions();
+            playerCollisions();
             repaint();
         });
         timer.start();
@@ -126,6 +132,7 @@ public class GamePanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 bullets.add(new Rectangle(playerX + 25, playerY, 10, 20));
+                audioPlayer.playSoundEffect("res/shoot.wav");
                 repaint();
             }
         });
@@ -142,7 +149,7 @@ public class GamePanel extends JPanel {
     }
 
     private void spawnItem(int x, int y) {
-        if (random.nextInt(100) < 100) {
+        if (random.nextInt(100) < 5) {
             String[] itemTypes = { "shield", "multi-shot", "minion", "laser" };
             String itemType = itemTypes[random.nextInt(itemTypes.length)];
             BufferedImage itemImage = null;
@@ -213,6 +220,7 @@ public class GamePanel extends JPanel {
                 Rectangle bullet = bulletIterator.next();
                 if (enemy.getBounds().intersects(bullet)) {
                     spawnItem(enemy.getX(), enemy.getY());
+                    audioPlayer.playSoundEffect("res/explode.wav");
                     enemyIterator.remove();
                     bulletIterator.remove();
                     break;
@@ -226,6 +234,19 @@ public class GamePanel extends JPanel {
             if (new Rectangle(playerX, playerY, 60, 60).intersects(item.getBounds())) {
                 applyItemEffect(item.getType());
                 itemIterator.remove();
+            }
+        }
+    }
+
+    private void playerCollisions() {
+        Iterator<Enemy> enemyIterator = enemies.iterator();
+        while (enemyIterator.hasNext()) {
+            Enemy enemy = enemyIterator.next();
+            if (new Rectangle(playerX, playerY, 60, 60).intersects(enemy.getBounds())) {
+                audioPlayer.playSoundEffect("res/explode.wav");
+                timer.stop();
+                JOptionPane.showMessageDialog(this, "Game Over!", "Collision Detected", JOptionPane.ERROR_MESSAGE);
+                break;
             }
         }
     }
