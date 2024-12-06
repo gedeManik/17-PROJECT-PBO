@@ -38,6 +38,25 @@ public class DatabaseConn {
         }
         return players;
     }
+
+    public static void savePlayerToDatabase(String username, int score) {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+
+            String sql = "INSERT INTO spacewar (username, score) VALUES (?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, username);
+            preparedStatement.setInt(2, score);
+
+            preparedStatement.executeUpdate();
+            connection.close();
+
+            System.out.println("Player data saved successfully!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
 
 
