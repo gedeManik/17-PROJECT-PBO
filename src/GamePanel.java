@@ -26,6 +26,9 @@ public class GamePanel extends JPanel {
     private ArrayList<Item> items;
     private Random random;
 
+    private int collisionCount = 0; // Untuk melacak tabrakan
+    private boolean gameOver = false; // Status game selesai
+    
     public GamePanel() {
         setBackground(Color.BLACK);
         setFocusable(true);
@@ -206,7 +209,15 @@ public class GamePanel extends JPanel {
         while (enemyIterator.hasNext()) {
             Enemy enemy = enemyIterator.next();
             if (new Rectangle(playerX, playerY, 60, 60).intersects(enemy.getBounds())) {
+                collisionCount++;
                 enemyIterator.remove();
+                if (collisionCount >= 3) {
+                    gameOver = true;
+                    timer.stop();
+                    showGameOverDialog();
+                    return;
+                }
+
             }
             Iterator<Rectangle> bulletIterator = bullets.iterator();
             while (bulletIterator.hasNext()) {
@@ -229,6 +240,29 @@ public class GamePanel extends JPanel {
             }
         }
     }
+
+    private void showGameOverDialog() {
+        String playerName = JOptionPane.showInputDialog(this, "Game Over! Masukkan nama Anda:", "Game Over", JOptionPane.PLAIN_MESSAGE);
+        if (playerName != null && !playerName.isEmpty()) {
+            int finalScore = calculateFinalScore(); 
+            saveToDatabase(playerName, finalScore);
+            JOptionPane.showMessageDialog(this, "Skor Anda telah disimpan!", "Info", JOptionPane.INFORMATION_MESSAGE);
+        }
+
+        SwingUtilities.getWindowAncestor(this).dispose();
+        SpaceWarGUI.main(null);
+    }
+
+    private int calculateFinalScore() {
+        int baseScore = 1000;
+        int penalty = collisionCount * 100; 
+        return Math.max(baseScore - penalty, 0); 
+    }
+
+    private void saveToDatabase(String playerName, int score) {
+        DatabaseConn.savePlayerToDatabase(playerName, score);
+    }
+
 
     private void applyItemEffect(String itemType) {
         switch (itemType) {
