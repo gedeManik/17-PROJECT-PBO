@@ -26,6 +26,10 @@ public class GamePanel extends JPanel {
     private ArrayList<Item> items;
     private Random random;
     private AudioPlayer audioPlayer;
+    private int playerHealth = 3;
+    private int score = 0;
+    private Image heartFull;
+    private Image heartLoss;
 
     private int collisionCount = 0; // Untuk melacak tabrakan
     private boolean gameOver = false; // Status game selesai
@@ -44,6 +48,9 @@ public class GamePanel extends JPanel {
         shipParts = dividerShip.getShipParts();
         enemyParts = dividerShip.getEnemyParts();
         itemsParts = dividerItems.getItemsPart();
+
+        heartFull = new ImageIcon("res/hearts.png").getImage();
+        heartLoss = new ImageIcon("res/heartsLess.png").getImage();
 
         // Muat gambar latar
         backgroundImage = new ImageIcon("res\\bg-1.png").getImage();
@@ -152,7 +159,7 @@ public class GamePanel extends JPanel {
 
     private void spawnItem(int x, int y) {
         if (random.nextInt(100) < 100) {
-            String[] itemTypes = { "shield", "multi-shot", "minion", "laser" };
+            String[] itemTypes = { "shield", "multi-shot", "heal", "laser" };
             String itemType = itemTypes[random.nextInt(itemTypes.length)];
             BufferedImage itemImage = null;
 
@@ -163,7 +170,7 @@ public class GamePanel extends JPanel {
                 case "multi-shot":
                     itemImage = itemsParts[0][1];
                     break;
-                case "minion":
+                case "heal":
                     itemImage = itemsParts[0][2];
                     break;
                 case "laser":
@@ -216,8 +223,9 @@ public class GamePanel extends JPanel {
             Enemy enemy = enemyIterator.next();
             if (new Rectangle(playerX, playerY, 60, 60).intersects(enemy.getBounds())) {
                 collisionCount++;
+                playerHealth--;
                 enemyIterator.remove();
-                if (collisionCount >= 3) {
+                if (playerHealth <= 0) {
                     gameOver = true;
                     timer.stop();
                     showGameOverDialog();
@@ -225,12 +233,14 @@ public class GamePanel extends JPanel {
                 }
 
             }
+
             Iterator<Rectangle> bulletIterator = bullets.iterator();
             while (bulletIterator.hasNext()) {
                 Rectangle bullet = bulletIterator.next();
                 if (enemy.getBounds().intersects(bullet)) {
                     spawnItem(enemy.getX(), enemy.getY());
                     audioPlayer.playSoundEffect("res/explode.wav");
+                    score += 20;
                     enemyIterator.remove();
                     bulletIterator.remove();
                     break;
@@ -294,8 +304,12 @@ public class GamePanel extends JPanel {
             case "multi-shot":
                 System.out.println("Multi-shot enabled!");
                 break;
-            case "minion":
-                System.out.println("Minion deployed!");
+            case "heal":
+                System.out.println("heal deployed!");
+                if (playerHealth < 3) {
+                    playerHealth++;
+                    System.out.println("Health restored! Current HP: " + playerHealth);
+                }
                 break;
             case "laser":
                 System.out.println("Laser charged!");
@@ -324,5 +338,23 @@ public class GamePanel extends JPanel {
         for (Item item : items) {
             g.drawImage(item.getImage(), item.getX(), item.getY(), 40, 40, null);
         }
+
+        // Gambar HP di pojok kiri atas (menampilkan gambar hati penuh dan hilang)
+        for (int i = 0; i < 3; i++) {
+            if (i < playerHealth) {
+                // Gambar hati penuh untuk HP yang ada
+                g.drawImage(heartFull, 10 + i * 40, 10, 30, 30, null);
+            } else {
+                // Gambar hati hilang untuk HP yang hilang
+                g.drawImage(heartLoss, 10 + i * 40, 10, 30, 30, null);
+            }
+        }
+
+        g.setColor(Color.WHITE); // Warna teks score
+        g.setFont(new Font("Arial", Font.BOLD, 24)); // Font score
+        String scoreText = "Score: " + score;
+        int textWidth = g.getFontMetrics().stringWidth(scoreText);
+        g.drawString(scoreText, getWidth() - textWidth - 20, 30);
+
     }
 }
