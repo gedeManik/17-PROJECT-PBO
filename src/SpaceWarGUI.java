@@ -90,6 +90,17 @@ public class SpaceWarGUI {
             gamePanel.requestFocusInWindow();
         });
 
+        scoreButton.addActionListener(e -> {
+            TopScore topscore = new TopScore();
+            frame.getContentPane().removeAll(); 
+            frame.setContentPane(topscore); // pindah ke game panel
+            frame.revalidate();
+            frame.repaint();
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+            topscore.requestFocusInWindow();
+        });
+
         // Make the frame visible
         frame.setVisible(true);
     }

@@ -271,12 +271,10 @@ public class GamePanel extends JPanel {
         }
     }
 
-   
-
     private void showGameOverDialog() {
         String playerName = JOptionPane.showInputDialog(this, "Game Over! Masukkan nama Anda:", "Game Over", JOptionPane.PLAIN_MESSAGE);
         if (playerName != null && !playerName.isEmpty()) {
-            int finalScore = calculateFinalScore(); 
+            int finalScore = score; 
             saveToDatabase(playerName, finalScore);
             JOptionPane.showMessageDialog(this, "Skor Anda telah disimpan!", "Info", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -285,11 +283,11 @@ public class GamePanel extends JPanel {
         SpaceWarGUI.main(null);
     }
 
-    private int calculateFinalScore() {
-        int baseScore = 1000;
-        int penalty = collisionCount * 100; 
-        return Math.max(baseScore - penalty, 0); 
-    }
+    // private int calculateFinalScore() {
+    //     int baseScore = 1000;
+    //     int penalty = collisionCount * 100; 
+    //     return Math.max(baseScore - penalty, 0); 
+    // }
 
     private void saveToDatabase(String playerName, int score) {
         DatabaseConn.savePlayerToDatabase(playerName, score);
