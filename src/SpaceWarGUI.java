@@ -90,6 +90,22 @@ public class SpaceWarGUI {
             gamePanel.requestFocusInWindow();
         });
 
+        scoreButton.addActionListener(e -> {
+            TopScore topscore = new TopScore();
+            frame.getContentPane().removeAll(); 
+            frame.setContentPane(topscore); // pindah ke game panel
+            frame.revalidate();
+            frame.repaint();
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+            topscore.requestFocusInWindow();
+        });
+
+        exitButton.addActionListener(e -> {
+            // Close the application by calling System.exit(0)
+            System.exit(0);
+        });
+
         // Make the frame visible
         frame.setVisible(true);
     }
