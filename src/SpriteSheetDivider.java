@@ -56,13 +56,13 @@ public class SpriteSheetDivider {
     }
 
     public BufferedImage[][] getBosParts() {
-        int rows = 4;
-        int cols = 6;
+        int rows = 2;
+        int cols = 3;
         bosParts = new BufferedImage[rows][cols];
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                bosParts[i][j] = sprite[i + 6][j + 5];
+                bosParts[i][j] = sprite[i + 3][j + 2];
             }
         }
         return bosParts;

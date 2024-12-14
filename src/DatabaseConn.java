@@ -40,26 +40,24 @@ public class DatabaseConn {
     }
 }
 
-
-
 // package src;
 
 // import java.sql.Connection;
 // import java.sql.DriverManager;
 
 // public class DatabaseConn {
-//     public static void main(String[] args) {
-//         String URL = "jdbc:mysql://localhost:3306/spacewar";
-//         String USER = "root";
-//         String PASSWORD = "manik"; //sesuaikan dengan password masing masing
+// public static void main(String[] args) {
+// String URL = "jdbc:mysql://localhost:3306/spacewar";
+// String USER = "root";
+// String PASSWORD = "manik"; //sesuaikan dengan password masing masing
 
-//         try {
-//             Class.forName("com.mysql.cj.jdbc.Driver");
-//             Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
-//             System.out.println("Connected to the database!");
-//             connection.close();
-//         } catch (Exception e) {
-//             e.printStackTrace();
-//         }
-//     }
+// try {
+// Class.forName("com.mysql.cj.jdbc.Driver");
+// Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
+// System.out.println("Connected to the database!");
+// connection.close();
+// } catch (Exception e) {
+// e.printStackTrace();
+// }
+// }
 // }
