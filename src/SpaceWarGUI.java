@@ -6,7 +6,7 @@ public class SpaceWarGUI {
     public static void main(String[] args) {
         // Create the JFrame
         JFrame frame = new JFrame("SpaceWar!");
-        int width = 400;  // Set the width
+        int width = 400; // Set the width
         int height = 800; // Set the height for 1:2 ratio
         frame.setSize(width, height);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -45,7 +45,7 @@ public class SpaceWarGUI {
         playButton.setForeground(Color.WHITE);
         playButton.setAlignmentX(Component.CENTER_ALIGNMENT); // Center align
         playButton.setMaximumSize(new Dimension(150, 40)); // Set button size
-        buttonPanel.add(playButton);        
+        buttonPanel.add(playButton);
 
         // Add spacing between buttons
         buttonPanel.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -82,7 +82,7 @@ public class SpaceWarGUI {
 
         playButton.addActionListener(e -> {
             GamePanel gamePanel = new GamePanel();
-            frame.getContentPane().removeAll(); 
+            frame.getContentPane().removeAll();
             frame.setContentPane(gamePanel); // pindah ke game panel
             frame.revalidate();
             frame.repaint();

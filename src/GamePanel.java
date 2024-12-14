@@ -9,12 +9,13 @@ import java.util.Random;
 
 public class GamePanel extends JPanel {
     private Timer timer;
-    private int playerX = 180;
-    private int playerY = 700;
+
+    // image
     private BufferedImage[][] shipParts;
     private BufferedImage[][] enemyParts;
     private BufferedImage[][] itemsParts;
-    private int currentShipIndex = 3;
+    private BufferedImage[][] bosParts;
+    private int currentShipIndex = 4;
     private int currentDirection = 1;
 
     private Image backgroundImage;
@@ -30,10 +31,23 @@ public class GamePanel extends JPanel {
     private int score = 0;
     private Image heartFull;
     private Image heartLoss;
+    private Boss boss;
+    private boolean isBossFightActive = false;
+
+    // Player
+    private int playerX = 180;
+    private int playerY = 700;
+    private int playerEnergy = 100;
+    private int maxEnergy = 100;
+    private final int energyCost = 10;
+    private final int energyRegenRate = 10;
+    private final int energyRegenDelay = 1000;
+    private long lastEnergyRegenTime = 0;
+    private boolean canShoot = true;
 
     private int collisionCount = 0; // Untuk melacak tabrakan
     private boolean gameOver = false; // Status game selesai
-    
+
     public GamePanel() {
         setBackground(Color.BLACK);
         setFocusable(true);
@@ -45,9 +59,14 @@ public class GamePanel extends JPanel {
         // Inisialisasi pembagian sprite
         SpriteSheetDivider dividerShip = new SpriteSheetDivider("res" + File.separator + "Ship.png", 10, 10);
         SpriteSheetDivider dividerItems = new SpriteSheetDivider("res" + File.separator + "Item.png", 8, 13);
+        SpriteSheetDivider dividerBos = new SpriteSheetDivider("res" + File.separator + "Ship.png", 5, 5);
         shipParts = dividerShip.getShipParts();
         enemyParts = dividerShip.getEnemyParts();
         itemsParts = dividerItems.getItemsPart();
+        bosParts = dividerBos.getBosParts();
+
+        heartFull = new ImageIcon("res/hearts.png").getImage();
+        heartLoss = new ImageIcon("res/heartsLess.png").getImage();
 
         heartFull = new ImageIcon("res/hearts.png").getImage();
         heartLoss = new ImageIcon("res/heartsLess.png").getImage();
@@ -76,10 +95,21 @@ public class GamePanel extends JPanel {
             if (backgroundY2 >= getHeight()) {
                 backgroundY2 = backgroundY1 - getHeight();
             }
+
+            spawnBos();
             spawnEnemies();
             moveEnemies();
             moveBullets();
             moveItems();
+
+            if (isBossFightActive && boss != null) {
+                if (random.nextInt(100) < 5) { // Boss shoots with a 5% chance per frame
+                    boss.shoot();
+                }
+            }
+
+            regenerateEnergy();
+            resetShootAbility();
             checkCollisions();
             repaint();
         });
@@ -140,15 +170,31 @@ public class GamePanel extends JPanel {
         getActionMap().put("fireBullet", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                bullets.add(new Rectangle(playerX + 25, playerY, 10, 20));
-                audioPlayer.playSoundEffect("res/shoot.wav");
+                handlePlayerShooting();
                 repaint();
             }
         });
     }
 
+    private void handlePlayerShooting() {
+        if (playerEnergy >= energyCost && canShoot) {
+            bullets.add(new Rectangle(playerX + 25, playerY, 10, 20));
+            playerEnergy -= energyCost;
+            canShoot = false;
+            audioPlayer.playSoundEffect("res/shoot.wav");
+        }
+    }
+
+    private void resetShootAbility() {
+        canShoot = true;
+    }
+
     private void spawnEnemies() {
-        if (random.nextInt(100) < 2) {
+        if (isBossFightActive)
+            return;
+
+        int spawnChance = 2 - (score / 1000);
+        if (random.nextInt(100) < Math.max(spawnChance, 1)) {
             int x = random.nextInt(getWidth() - 60);
             int enemyRow = random.nextInt(enemyParts.length);
             int enemyCol = random.nextInt(enemyParts[0].length);
@@ -157,24 +203,36 @@ public class GamePanel extends JPanel {
         }
     }
 
+    private void spawnBos() {
+        if (!isBossFightActive && score > 0 && score % 1000 == 0) {
+            int x = random.nextInt(getWidth() - 60);
+            int bosRow = random.nextInt(2);
+            int bosCol = random.nextInt(3);
+            BufferedImage bosImage = bosParts[bosRow][bosCol];
+
+            if (isBossFightActive && boss != null) {
+                int newHealth = boss.getHealth() + 100;
+                boss = new Boss(x, 0, 100, 100, bosImage, newHealth);
+            } else {
+                boss = new Boss(x, 0, 100, 100, bosImage, 100);
+            }
+
+            isBossFightActive = true;
+        }
+    }
+
     private void spawnItem(int x, int y) {
-        if (random.nextInt(100) < 100) {
-            String[] itemTypes = { "shield", "multi-shot", "heal", "laser" };
+        if (random.nextInt(100) < 5) {
+            String[] itemTypes = { "heal", "energy" };
             String itemType = itemTypes[random.nextInt(itemTypes.length)];
             BufferedImage itemImage = null;
 
             switch (itemType) {
-                case "shield":
-                    itemImage = itemsParts[0][0];
-                    break;
-                case "multi-shot":
-                    itemImage = itemsParts[0][1];
-                    break;
                 case "heal":
                     itemImage = itemsParts[0][2];
                     break;
-                case "laser":
-                    itemImage = itemsParts[0][3];
+                case "energy":
+                    itemImage = itemsParts[1][2];
                     break;
             }
 
@@ -185,10 +243,14 @@ public class GamePanel extends JPanel {
     }
 
     private void moveEnemies() {
+        if (isBossFightActive) {
+            boss.move();
+        }
+
         Iterator<Enemy> iterator = enemies.iterator();
         while (iterator.hasNext()) {
             Enemy enemy = iterator.next();
-            enemy.moveDown(5);
+            enemy.move();
             if (enemy.getY() > getHeight()) {
                 iterator.remove();
             }
@@ -196,6 +258,8 @@ public class GamePanel extends JPanel {
     }
 
     private void moveBullets() {
+        int bulletSpeed = 5 + (score / 1000);
+
         Iterator<Rectangle> iterator = bullets.iterator();
         while (iterator.hasNext()) {
             Rectangle bullet = iterator.next();
@@ -204,20 +268,63 @@ public class GamePanel extends JPanel {
                 iterator.remove();
             }
         }
+
+        if (isBossFightActive && boss != null) {
+            ArrayList<Rectangle> bossBullets = boss.getBullets();
+            Iterator<Rectangle> bossBulletIterator = bossBullets.iterator();
+            while (bossBulletIterator.hasNext()) {
+                Rectangle bossBullet = bossBulletIterator.next();
+                bossBullet.y += bulletSpeed;
+                if (bossBullet.y > getHeight()) {
+                    bossBulletIterator.remove();
+                }
+            }
+        }
     }
 
     private void moveItems() {
         Iterator<Item> iterator = items.iterator();
         while (iterator.hasNext()) {
             Item item = iterator.next();
-            item.moveDown(5);
+            item.move();
             if (item.getY() > getHeight()) {
                 iterator.remove();
             }
         }
     }
 
+    private void regenerateEnergy() {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastEnergyRegenTime >= energyRegenDelay) {
+            if (playerEnergy < maxEnergy) {
+                playerEnergy += energyRegenRate;
+                if (playerEnergy > maxEnergy) {
+                    playerEnergy = maxEnergy;
+                }
+            }
+            lastEnergyRegenTime = currentTime;
+        }
+    }
+
     private void checkCollisions() {
+        if (isBossFightActive && boss != null) {
+            for (Rectangle bossBullet : boss.getBullets()) {
+                if (new Rectangle(playerX, playerY, 60, 60).intersects(bossBullet)) {
+                    collisionCount++;
+                    playerHealth--;
+                    if (playerHealth <= 0) {
+                        audioPlayer.playSoundEffect("res/explode.wav");
+                        gameOver = true;
+                        timer.stop();
+                        showGameOverDialog();
+                        return;
+                    }
+                    boss.getBullets().remove(bossBullet);
+                    break;
+                }
+            }
+        }
+
         Iterator<Enemy> enemyIterator = enemies.iterator();
         while (enemyIterator.hasNext()) {
             Enemy enemy = enemyIterator.next();
@@ -226,12 +333,12 @@ public class GamePanel extends JPanel {
                 playerHealth--;
                 enemyIterator.remove();
                 if (playerHealth <= 0) {
+                    audioPlayer.playSoundEffect("res/explode.wav");
                     gameOver = true;
                     timer.stop();
                     showGameOverDialog();
                     return;
                 }
-
             }
 
             Iterator<Rectangle> bulletIterator = bullets.iterator();
@@ -248,9 +355,29 @@ public class GamePanel extends JPanel {
             }
         }
 
+        // Handle collisions with the boss
+        if (isBossFightActive) {
+            Iterator<Rectangle> bulletIterator = bullets.iterator();
+            while (bulletIterator.hasNext()) {
+                Rectangle bullet = bulletIterator.next();
+                if (boss.getBounds().intersects(bullet)) {
+                    boss.reduceHealth(10);
+                    if (boss.getHealth() <= 0) {
+                        audioPlayer.playSoundEffect("res/explode.wav");
+                        isBossFightActive = false;
+                        boss = null;
+                        score += 200;
+                        break;
+                    }
+                    bulletIterator.remove(); // Remove the bullet if it hits the boss
+                }
+            }
+        }
+
         Iterator<Item> itemIterator = items.iterator();
         while (itemIterator.hasNext()) {
             Item item = itemIterator.next();
+
             if (new Rectangle(playerX, playerY, 60, 60).intersects(item.getBounds())) {
                 applyItemEffect(item.getType());
                 itemIterator.remove();
@@ -258,17 +385,27 @@ public class GamePanel extends JPanel {
         }
     }
 
-    private void playerCollisions() {
-        Iterator<Enemy> enemyIterator = enemies.iterator();
-        while (enemyIterator.hasNext()) {
-            Enemy enemy = enemyIterator.next();
-            if (new Rectangle(playerX, playerY, 60, 60).intersects(enemy.getBounds())) {
-                audioPlayer.playSoundEffect("res/explode.wav");
-                timer.stop();
-                JOptionPane.showMessageDialog(this, "Game Over!", "Collision Detected", JOptionPane.ERROR_MESSAGE);
-                break;
-            }
+    private void showGameOverDialog() {
+        String playerName = JOptionPane.showInputDialog(this, "Game Over! Masukkan nama Anda:", "Game Over",
+                JOptionPane.PLAIN_MESSAGE);
+        if (playerName != null && !playerName.isEmpty()) {
+            int finalScore = calculateFinalScore();
+            saveToDatabase(playerName, finalScore);
+            JOptionPane.showMessageDialog(this, "Skor Anda telah disimpan!", "Info", JOptionPane.INFORMATION_MESSAGE);
         }
+
+        SwingUtilities.getWindowAncestor(this).dispose();
+        SpaceWarGUI.main(null);
+    }
+
+    private int calculateFinalScore() {
+        int baseScore = 1000;
+        int penalty = collisionCount * 100;
+        return Math.max(baseScore - penalty, 0);
+    }
+
+    private void saveToDatabase(String playerName, int score) {
+        DatabaseConn.savePlayerToDatabase(playerName, score);
     }
 
     private void showGameOverDialog() {
@@ -396,21 +533,18 @@ public class GamePanel extends JPanel {
 
     private void applyItemEffect(String itemType) {
         switch (itemType) {
-            case "shield":
-                System.out.println("Shield activated!");
-                break;
-            case "multi-shot":
-                System.out.println("Multi-shot enabled!");
-                break;
             case "heal":
-                System.out.println("heal deployed!");
+                // Ensure health only increases if it's less than the maximum (3)
                 if (playerHealth < 3) {
                     playerHealth++;
                     System.out.println("Health restored! Current HP: " + playerHealth);
                 }
                 break;
-            case "laser":
-                System.out.println("Laser charged!");
+
+            case "energy":
+                maxEnergy += 10; // Increase max energy by 10
+                playerEnergy = maxEnergy; // Restore energy to max
+                System.out.println("Energy upgraded! Max Energy: " + maxEnergy);
                 break;
         }
     }
@@ -423,6 +557,22 @@ public class GamePanel extends JPanel {
         g.drawImage(backgroundImage, 0, backgroundY2, getWidth(), getHeight(), null);
 
         g.drawImage(shipParts[currentShipIndex][currentDirection], playerX, playerY, 60, 60, null);
+
+        g.setColor(Color.DARK_GRAY);
+        g.fillRoundRect(10, 40, 200, 20, 20, 20); // Draw background of energy bar
+
+        int energyWidth = (int) ((double) playerEnergy / maxEnergy * 200);
+        g.setColor(Color.GREEN);
+        g.fillRoundRect(10, 40, energyWidth, 20, 20, 20);
+
+        if (isBossFightActive && boss != null) {
+            g.drawImage(boss.getImage(), boss.getX(), boss.getY(), boss.getWidth(), boss.getHeight(), null);
+
+            for (Rectangle bossBullet : boss.getBullets()) {
+                g.setColor(Color.RED);
+                g.fillRect(bossBullet.x, bossBullet.y, bossBullet.width, bossBullet.height);
+            }
+        }
 
         for (Enemy enemy : enemies) {
             g.drawImage(enemy.getImage(), enemy.getX(), enemy.getY(), enemy.getWidth(), enemy.getHeight(), null);
@@ -440,10 +590,8 @@ public class GamePanel extends JPanel {
         // Gambar HP di pojok kiri atas (menampilkan gambar hati penuh dan hilang)
         for (int i = 0; i < 3; i++) {
             if (i < playerHealth) {
-                // Gambar hati penuh untuk HP yang ada
                 g.drawImage(heartFull, 10 + i * 40, 10, 30, 30, null);
             } else {
-                // Gambar hati hilang untuk HP yang hilang
                 g.drawImage(heartLoss, 10 + i * 40, 10, 30, 30, null);
             }
         }
@@ -453,6 +601,5 @@ public class GamePanel extends JPanel {
         String scoreText = "Score: " + score;
         int textWidth = g.getFontMetrics().stringWidth(scoreText);
         g.drawString(scoreText, getWidth() - textWidth - 20, 30);
-
     }
 }

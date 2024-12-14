@@ -1,43 +1,20 @@
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class Enemy {
-    private int x, y, width, height;
-    private BufferedImage image;
+public class Enemy extends GameObject implements Behavior {
 
     public Enemy(int x, int y, int width, int height, BufferedImage image) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.image = image;
+        super(x, y, width, height, image);
     }
 
-    public void moveDown(int speed) {
-        y += speed;
+    @Override
+    public void move() {
+        y += 5;
     }
 
-    public Rectangle getBounds() {
-        return new Rectangle(x, y, width, height);
+    @Override
+    public void shoot() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'shot'");
     }
 
-    public BufferedImage getImage() {
-        return image;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
 }
