@@ -101,6 +101,11 @@ public class SpaceWarGUI {
             topscore.requestFocusInWindow();
         });
 
+        exitButton.addActionListener(e -> {
+            // Close the application by calling System.exit(0)
+            System.exit(0);
+        });
+
         // Make the frame visible
         frame.setVisible(true);
     }

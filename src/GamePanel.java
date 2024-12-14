@@ -272,15 +272,115 @@ public class GamePanel extends JPanel {
     }
 
     private void showGameOverDialog() {
-        String playerName = JOptionPane.showInputDialog(this, "Game Over! Masukkan nama Anda:", "Game Over", JOptionPane.PLAIN_MESSAGE);
-        if (playerName != null && !playerName.isEmpty()) {
-            int finalScore = score; 
-            saveToDatabase(playerName, finalScore);
-            JOptionPane.showMessageDialog(this, "Skor Anda telah disimpan!", "Info", JOptionPane.INFORMATION_MESSAGE);
-        }
+        JDialog gameOverDialog = new JDialog((Frame) null, "SpaceWar!", true);
+        gameOverDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        gameOverDialog.setSize(400, 300);
+        gameOverDialog.setLocationRelativeTo(this);
 
-        SwingUtilities.getWindowAncestor(this).dispose();
-        SpaceWarGUI.main(null);
+        // Panel utama untuk dialog
+        JPanel mainPanel = new JPanel();
+        mainPanel.setBackground(Color.BLACK);
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+
+        // Label "Game Over"
+        JLabel gameOverLabel = new JLabel("Game Over!");
+        gameOverLabel.setFont(new Font("Arial", Font.BOLD, 30));
+        gameOverLabel.setForeground(Color.RED);
+        gameOverLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mainPanel.add(gameOverLabel);
+
+        // Spasi
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        // Input nama pemain
+        JLabel nameLabel = new JLabel("Masukkan nama Anda:");
+        nameLabel.setFont(new Font("Arial", Font.PLAIN, 18));
+        nameLabel.setForeground(Color.WHITE);
+        nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mainPanel.add(nameLabel);
+
+        JTextField nameField = new JTextField();
+        nameField.setMaximumSize(new Dimension(200, 30));
+        nameField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mainPanel.add(nameField);
+
+        // Spasi
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        // Tombol Save dan Cancel
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.BLACK);
+
+        JButton saveButton = new JButton("Save");
+        saveButton.setFont(new Font("Arial", Font.PLAIN, 20));
+        saveButton.setForeground(Color.WHITE);
+        saveButton.setBackground(Color.DARK_GRAY);
+        saveButton.setFocusPainted(false);
+        saveButton.setBorderPainted(false);
+        buttonPanel.add(saveButton);
+
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.setFont(new Font("Arial", Font.PLAIN, 20));
+        cancelButton.setForeground(Color.WHITE);
+        cancelButton.setBackground(Color.DARK_GRAY);
+        cancelButton.setFocusPainted(false);
+        cancelButton.setBorderPainted(false);
+        buttonPanel.add(cancelButton);
+
+        mainPanel.add(buttonPanel);
+
+        // Tombol Save action listener
+        saveButton.addActionListener(e -> {
+            String playerName = nameField.getText().trim();
+            if (!playerName.isEmpty()) {
+                int finalScore = score;
+                saveToDatabase(playerName, finalScore);
+    
+                // Kustom GUI untuk pesan dialog
+                JDialog messageDialog = new JDialog((Frame) null, "SpaceWar!", true);
+                messageDialog.setSize(300, 200);
+                messageDialog.setLocationRelativeTo(gameOverDialog);
+    
+                JPanel panel = new JPanel();
+                panel.setBackground(Color.BLACK);
+                panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    
+                JLabel messageLabel = new JLabel("Skor Anda telah disimpan!");
+                messageLabel.setFont(new Font("Arial", Font.BOLD, 18));
+                messageLabel.setForeground(Color.GREEN);
+                messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+                panel.add(Box.createRigidArea(new Dimension(0, 50)));
+                panel.add(messageLabel);
+    
+                JButton okButton = new JButton("OK");
+                okButton.setFont(new Font("Arial", Font.PLAIN, 16));
+                okButton.setForeground(Color.WHITE);
+                okButton.setBackground(Color.DARK_GRAY);
+                okButton.setFocusPainted(false);
+                okButton.setBorderPainted(false);
+                okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+                panel.add(Box.createRigidArea(new Dimension(0, 20)));
+                panel.add(okButton);
+    
+                okButton.addActionListener(ev -> messageDialog.dispose());
+    
+                messageDialog.add(panel);
+                messageDialog.setVisible(true);
+            }
+            gameOverDialog.dispose();
+            SwingUtilities.getWindowAncestor(this).dispose(); // Menutup jendela game
+            SpaceWarGUI.main(null); // Membuka menu utama
+        });
+
+        // Tombol Cancel action listener
+        cancelButton.addActionListener(e -> {
+            gameOverDialog.dispose();
+            SwingUtilities.getWindowAncestor(this).dispose(); // Menutup jendela game
+            SpaceWarGUI.main(null); // Membuka menu utama
+        });
+
+        gameOverDialog.add(mainPanel);
+        gameOverDialog.setVisible(true);
     }
 
     // private int calculateFinalScore() {

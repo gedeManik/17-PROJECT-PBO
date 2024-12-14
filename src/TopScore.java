@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 
 public class TopScore extends JPanel {
@@ -10,7 +12,7 @@ public class TopScore extends JPanel {
         // Load the background image using ImageIcon
         backgroundImage = new ImageIcon("res/Bg-1.png");
 
-        setLayout(new GridLayout(3, 1)); // Set GridLayout to match the SpaceWarGUI layout
+        setLayout(new GridLayout(5, 1)); // Set GridLayout to match the SpaceWarGUI layout
 
         // Grid 1: Title Label ("TOP SCORE")
         JLabel titleLabel = new JLabel("TOP SCORE", JLabel.CENTER);
@@ -30,6 +32,22 @@ public class TopScore extends JPanel {
         // Grid 3: Top Score Display (Using a JPanel to display scores)
         add(new JLabel()); // Empty label for spacing
 
+        // Grid 4: Back Button
+        JButton backButton = new JButton("Back");
+        backButton.setFont(new Font("Arial", Font.PLAIN, 20));
+        backButton.setFocusPainted(false);
+        backButton.setBackground(Color.DARK_GRAY);
+        backButton.setForeground(Color.WHITE);
+        backButton.addActionListener(e -> {
+            // Tutup jendela saat ini
+            SwingUtilities.getWindowAncestor(this).dispose();
+            // Kembali ke menu utama
+            SpaceWarGUI.main(null);
+        });
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.setOpaque(false); // Transparent background
+        buttonPanel.add(backButton);
+        add(buttonPanel);
     }
 
     @Override
