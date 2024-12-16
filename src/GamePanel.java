@@ -103,7 +103,7 @@ public class GamePanel extends JPanel {
             moveItems();
 
             if (isBossFightActive && boss != null) {
-                if (random.nextInt(100) < 5) { // Boss shoots with a 5% chance per frame
+                if (random.nextInt(100) < 5) { //Boss shoots with a 5% chance per frame
                     boss.shoot();
                 }
             }
@@ -385,24 +385,24 @@ public class GamePanel extends JPanel {
         }
     }
 
-    private void showGameOverDialog() {
-        String playerName = JOptionPane.showInputDialog(this, "Game Over! Masukkan nama Anda:", "Game Over",
-                JOptionPane.PLAIN_MESSAGE);
-        if (playerName != null && !playerName.isEmpty()) {
-            int finalScore = calculateFinalScore();
-            saveToDatabase(playerName, finalScore);
-            JOptionPane.showMessageDialog(this, "Skor Anda telah disimpan!", "Info", JOptionPane.INFORMATION_MESSAGE);
-        }
+    // private void showGameOverDialog() {
+    //     String playerName = JOptionPane.showInputDialog(this, "Game Over! Masukkan nama Anda:", "Game Over",
+    //             JOptionPane.PLAIN_MESSAGE);
+    //     if (playerName != null && !playerName.isEmpty()) {
+    //         int finalScore = calculateFinalScore();
+    //         saveToDatabase(playerName, finalScore);
+    //         JOptionPane.showMessageDialog(this, "Skor Anda telah disimpan!", "Info", JOptionPane.INFORMATION_MESSAGE);
+    //     }
 
-        SwingUtilities.getWindowAncestor(this).dispose();
-        SpaceWarGUI.main(null);
-    }
+    //     SwingUtilities.getWindowAncestor(this).dispose();
+    //     SpaceWarGUI.main(null);
+    // }
 
-    private int calculateFinalScore() {
-        int baseScore = 1000;
-        int penalty = collisionCount * 100;
-        return Math.max(baseScore - penalty, 0);
-    }
+    // private int calculateFinalScore() {
+    //     int baseScore = 1000;
+    //     int penalty = collisionCount * 100;
+    //     return Math.max(baseScore - penalty, 0);
+    // }
 
     private void saveToDatabase(String playerName, int score) {
         DatabaseConn.savePlayerToDatabase(playerName, score);
@@ -526,9 +526,9 @@ public class GamePanel extends JPanel {
     //     return Math.max(baseScore - penalty, 0); 
     // }
 
-    private void saveToDatabase(String playerName, int score) {
-        DatabaseConn.savePlayerToDatabase(playerName, score);
-    }
+    // private void saveToDatabase(String playerName, int score) {
+    //     DatabaseConn.savePlayerToDatabase(playerName, score);
+    // }
 
 
     private void applyItemEffect(String itemType) {
